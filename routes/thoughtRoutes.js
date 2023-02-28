@@ -1,6 +1,6 @@
 // /api/thoughts
 const router = require("express").Router();
-const { Thought } = require("../models");
+const { Thought, User } = require("../models");
 
 // GET to get all thoughts
 router.get("/", async (req, res) => {
@@ -24,10 +24,11 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST to create a new thought (don't forget to push the created thought's _id to the associated user's thoughts array field)
-router.post("/", async (req, res) => {
+// POST to create a new thought (push the created thought's _id to the associated user's thoughts array field)
+router.post("/:id", async (req, res) => {
   try {
     const thought = await Thought.create(req.body);
+    const user = await User.findOneAndUpdate({ _id: req.params.id }, { $push: { thoughts: thought._id }});
     res.json(thought);
   } catch (err) {
     console.log("Error: ", err);
@@ -80,7 +81,7 @@ router.post("/:thoughtId/reactions", async (req, res) => {
   }
 });
 
-// DELETE to pull and remove a reaction by the reaction's reactionId value
+// DELETE to pull and remove a reaction by the reaction's reactionId value and delete it from the thoughts reactions array
 router.delete("/:thoughtId/reactions/:reactionId", async (req, res) => {
   try {
     const thought = await Thought.findById(req.params.thoughtId);
@@ -88,7 +89,7 @@ router.delete("/:thoughtId/reactions/:reactionId", async (req, res) => {
       return res.status(404).json({ message: "Thought not found" });
     }
     thought.reactions.pull({ _id: req.params.reactionId });
-    const updatedThought = await thought.save();
+    const updatedThought = await thought.save();    
     res.json(updatedThought);
   } catch (err) {
     console.error(err);

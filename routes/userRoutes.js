@@ -76,7 +76,6 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// /api/users/:userId/friends/:friendId
 
 // POST to add a new friend to a user's friend list
 router.post("/:userId/friends/:friendId", async (req, res) => {
