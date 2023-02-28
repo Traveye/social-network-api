@@ -20,3 +20,5 @@ const reactionSchema = new mongoose.Schema({
         get: (createdAtVal) => toLocaleDateString(createdAtVal)
     },
 });
+
+module.exports = reactionSchema;
